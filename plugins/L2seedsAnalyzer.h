@@ -88,6 +88,8 @@ using namespace std;
 #include <SimDataFormats/TrackingAnalysis/interface/TrackingVertex.h>
 #include "CommonTools/Utils/interface/StringCutObjectSelector.h"
 
+#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
+
 // root stuff 
 #include "TH1D.h"
 #include <map>
@@ -170,6 +172,10 @@ class L2seedsAnalyzer : public edm::EDAnalyzer {
         int T_Event_RunNumber;
         int T_Event_EventNumber;
         int T_Event_LuminosityBlock;
+        int T_Event_nPU;
+        int T_Event_nTruePU;
+        int T_Event_nPUm;
+        int T_Event_nPUp;
     
         //Reco Muon info
         std::vector<float>*T_Muon_Eta;

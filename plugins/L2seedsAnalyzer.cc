@@ -264,7 +264,31 @@ L2seedsAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
         edm::Handle<GenEventInfoProduct> genEvent;
         iEvent.getByLabel("generator", genEvent);
         iEvent.getByLabel("genParticles", genParticles );
-        
+       
+       Handle<std::vector< PileupSummaryInfo > > puInfo;
+       try {
+           iEvent.getByLabel("addPileupInfo",puInfo);
+           std::vector<PileupSummaryInfo>::const_iterator PVI;
+           //The in-time crossing is getBunchCrossing = 0; negative ones are early, positive ones are late.
+           for(PVI = puInfo->begin(); PVI != puInfo->end(); ++PVI) {
+               
+               //    std::cout << " Pileup Information: bunchXing, nvtx: " << PVI->getBunchCrossing() << " " << PVI->getPU_NumInteractions() << std::endl;
+               if(PVI->getBunchCrossing()==0){
+                   T_Event_nPU =PVI->getPU_NumInteractions();
+                   T_Event_nTruePU=PVI->getTrueNumInteractions();
+                   
+               }
+               
+               else if(PVI->getBunchCrossing()==-1){
+                   T_Event_nPUm=PVI->getPU_NumInteractions();
+               }
+               else if(PVI->getBunchCrossing()==1){
+                   T_Event_nPUp=PVI->getPU_NumInteractions();
+               }
+               //truePu += PVI->getTrueNumInteractions();
+           }
+       } catch (...) {}
+       
         int nbOfGen = genParticles->size();
         for (int j = 0 ; j < nbOfGen ; j++){
             const reco::GenParticle & theCand = (*genParticles)[j];
@@ -508,6 +532,10 @@ L2seedsAnalyzer::beginJob()
     mytree_->Branch("T_Event_RunNumber", &T_Event_RunNumber, "T_Event_RunNumber/I");
     mytree_->Branch("T_Event_EventNumber", &T_Event_EventNumber, "T_Event_EventNumber/I");
     mytree_->Branch("T_Event_LuminosityBlock", &T_Event_LuminosityBlock, "T_Event_LuminosityBlock/I");
+    mytree_->Branch("T_Event_nPU", &T_Event_nPU, "T_Event_nPU/I");
+    mytree_->Branch("T_Event_nTruePU", &T_Event_nTruePU, "T_Event_nTruePU/I");
+    mytree_->Branch("T_Event_nPUm", &T_Event_nPUm, "T_Event_nPUm/I");
+    mytree_->Branch("T_Event_nPUp", &T_Event_nPUp, "T_Event_nPUp/I");
 
     mytree_->Branch("T_Muon_Eta", "std::vector<float>", &T_Muon_Eta);
     mytree_->Branch("T_Muon_Phi", "std::vector<float>", &T_Muon_Phi);
